@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_import, slash_for_doc_comments, unnecessary_null_comparison, invalid_required_named_param
+
 import 'dart:async';
 import 'dart:convert';
 
@@ -145,7 +147,7 @@ class Jverify {
 
           JVListenerEvent event = JVListenerEvent.fromJson(json);
           if (json["loginAuthIndex"] != null) {
-            int index = json["loginAuthIndex"];
+            int? index = json["loginAuthIndex"];
             if (_eventHanders.loginAuthCallBackEventsMap.containsKey(index)) {
               _eventHanders.loginAuthCallBackEventsMap[index]!(event);
               _eventHanders.loginAuthCallBackEventsMap.remove(index);

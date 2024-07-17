@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_new, use_key_in_widget_constructors, library_private_types_in_public_api, non_constant_identifier_names, sort_child_properties_last, prefer_const_constructors, avoid_print, unused_local_variable, prefer_const_declarations, dead_code
+
 import 'dart:async';
 import 'dart:io';
 

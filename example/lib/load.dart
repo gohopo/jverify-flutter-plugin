@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_new, prefer_const_constructors
+
 import 'package:flutter/material.dart';
 
 class LoadingDialog {
