@@ -91,7 +91,7 @@ public class JverifyPlugin implements FlutterPlugin, MethodCallHandler {
 
     @Override
     public void onDetachedFromEngine(FlutterPluginBinding binding) {
-        channel.setMethodCallHandler(null);
+        if(channel!=null) channel.setMethodCallHandler(null);
     }
 
 

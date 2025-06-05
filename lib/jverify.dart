@@ -132,7 +132,7 @@ class Jverify {
         {
           Map json = call.arguments.cast<dynamic, dynamic>();
           JVAuthPageEvent ev = JVAuthPageEvent.fromJson(json);
-          int index = json["loginAuthIndex"];
+          int? index = json["loginAuthIndex"];
 
           for (JVAuthPageEventListener cb in _eventHanders.authPageEvents) {
             cb(ev);
