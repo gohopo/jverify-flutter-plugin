@@ -1,6 +1,10 @@
-import { JVerificationInterface, JVerificationLoginSettings, JVerifyUIConfig,
+import {
+  GenAuthThemeConfigBuilder,
+  JVerificationInterface, JVerificationLoginSettings, JVerifyUIConfig,
   JVerifyUIConfigBuilder } from '@jg/verify';
 import {
+  AbilityAware,
+  AbilityPluginBinding,
   FlutterPlugin,
   FlutterPluginBinding,
   MethodCall,
@@ -9,10 +13,13 @@ import {
   MethodResult,
 } from '@ohos/flutter_ohos';
 import { HashMap } from '@kit.ArkTS';
+import UIAbility from '@ohos.app.ability.UIAbility';
 
 /** JverifyPlugin **/
-export default class JverifyPlugin implements FlutterPlugin, MethodCallHandler {
-  private channel: MethodChannel | null = null;
+export default class JverifyPlugin implements FlutterPlugin, MethodCallHandler, AbilityAware {
+  private channel!: MethodChannel;
+  private context!: Context;
+  private uiAbility!: UIAbility;
 
   constructor() {
   }
@@ -23,13 +30,22 @@ export default class JverifyPlugin implements FlutterPlugin, MethodCallHandler {
 
   onAttachedToEngine(binding: FlutterPluginBinding): void {
     this.channel = new MethodChannel(binding.getBinaryMessenger(), "jverify");
-    this.channel.setMethodCallHandler(this)
+    this.channel.setMethodCallHandler(this);
+    this.context = binding.getApplicationContext();
   }
 
   onDetachedFromEngine(binding: FlutterPluginBinding): void {
     if (this.channel != null) {
       this.channel.setMethodCallHandler(null)
     }
+  }
+
+  onAttachedToAbility(binding: AbilityPluginBinding): void {
+    this.uiAbility = binding.getAbility();
+  }
+
+  onDetachedFromAbility(): void {
+
   }
 
   onMethodCall(call: MethodCall, result: MethodResult): void {
@@ -59,49 +75,49 @@ export default class JverifyPlugin implements FlutterPlugin, MethodCallHandler {
     result.success({result:isSuccess});
   }
   layoutOriginOuthView(uiConfig: HashMap<string,ESObject>, builder: JVerifyUIConfigBuilder){
-    let authBackgroundImage: string|undefined = uiConfig['authBackgroundImage'];
-    let logoOffsetX: number|undefined = uiConfig['logoOffsetX'];
-    let logoOffsetY: number|undefined = uiConfig['logoOffsetY'];
-    let logoWidth: number|undefined = uiConfig['logoWidth'];
-    let logoHeight: number|undefined = uiConfig['logoHeight'];
-    let logoImgPath: string|undefined = uiConfig['logoImgPath'];
-    let logoHidden: boolean|undefined = uiConfig['logoHidden'];
-    let numFieldOffsetX: number|undefined = uiConfig['numFieldOffsetX'];
-    let numFieldOffsetY: number|undefined = uiConfig['numFieldOffsetY'];
-    let numberFieldWidth: number|undefined = uiConfig['numberFieldWidth'];
-    let numberFieldHeight: number|undefined = uiConfig['numberFieldHeight'];
-    let numberSize: number|undefined = uiConfig['numberSize'];
-    let numberColor: number|undefined = uiConfig['numberColor'];
-    let numberTextBold: boolean|undefined = uiConfig['numberTextBold'];
-    let sloganOffsetX: number|undefined = uiConfig['sloganOffsetX'];
-    let sloganOffsetY: number|undefined = uiConfig['sloganOffsetY'];
-    let sloganTextSize: number|undefined = uiConfig['sloganTextSize'];
-    let sloganTextColor: number|undefined = uiConfig['sloganTextColor'];
-    let sloganTextBold: boolean|undefined = uiConfig['sloganTextBold'];
-    let logBtnOffsetX: number|undefined = uiConfig['logBtnOffsetX'];
-    let logBtnOffsetY: number|undefined = uiConfig['logBtnOffsetY'];
-    let logBtnWidth: number|undefined = uiConfig['logBtnWidth'];
-    let logBtnHeight: number|undefined = uiConfig['logBtnHeight'];
-    let logBtnText: string|undefined = uiConfig['logBtnText'];
-    let logBtnTextSize: number|undefined = uiConfig['logBtnTextSize'];
-    let logBtnTextColor: number|undefined = uiConfig['logBtnTextColor'];
-    let logBtnTextBold: boolean|undefined = uiConfig['logBtnTextBold'];
-    let logBtnBackgroundPath: string|undefined = uiConfig['logBtnBackgroundPath'];
-    let privacyCheckboxSize: number|undefined = uiConfig['privacyCheckboxSize'];
-    let checkedImgPath: string|undefined = uiConfig['checkedImgPath'];
-    let uncheckedImgPath: string|undefined = uiConfig['uncheckedImgPath'];
-    let privacyText: string[]|undefined = uiConfig['privacyText'];
-    let privacyTextSize: number|undefined = uiConfig['privacyTextSize'];
-    let privacyTextBold: boolean|undefined = uiConfig['privacyTextBold'];
-    let privacyUnderlineText: boolean|undefined = uiConfig['privacyUnderlineText'];
-    let privacyTextCenterGravity: boolean|undefined = uiConfig['privacyTextCenterGravity'];
-    let privacyCheckboxInCenter: boolean|undefined = uiConfig['privacyCheckboxInCenter'];
-    let privacyState: boolean|undefined = uiConfig['privacyState'];
-    let privacyNavColor: number|undefined = uiConfig['privacyNavColor'];
-    let privacyNavTitleTextSize: number|undefined = uiConfig['privacyNavTitleTextSize'];
-    let privacyNavTitleTextColor: number|undefined = uiConfig['privacyNavTitleTextColor'];
-    let privacyNavTitleTextBold: boolean|undefined = uiConfig['privacyNavTitleTextBold'];
-    let privacyNavReturnBtnPath: string|undefined = uiConfig['privacyNavReturnBtnPath'];
+    let authBackgroundImage = uiConfig.get('authBackgroundImage') as string;
+    let logoOffsetX = uiConfig.get('logoOffsetX') as number;
+    let logoOffsetY = uiConfig.get('logoOffsetY') as number;
+    let logoWidth = uiConfig.get('logoWidth') as number;
+    let logoHeight = uiConfig.get('logoHeight') as number;
+    let logoImgPath = uiConfig.get('logoImgPath') as string;
+    let logoHidden = uiConfig.get('logoHidden') as boolean;
+    let numFieldOffsetX = uiConfig.get('numFieldOffsetX') as number;
+    let numFieldOffsetY = uiConfig.get('numFieldOffsetY') as number;
+    let numberFieldWidth = uiConfig.get('numberFieldWidth') as number;
+    let numberFieldHeight = uiConfig.get('numberFieldHeight') as number;
+    let numberSize = uiConfig.get('numberSize') as number;
+    let numberColor = uiConfig.get('numberColor') as number;
+    let numberTextBold = uiConfig.get('numberTextBold') as boolean;
+    let sloganOffsetX = uiConfig.get('sloganOffsetX') as number;
+    let sloganOffsetY = uiConfig.get('sloganOffsetY') as number;
+    let sloganTextSize = uiConfig.get('sloganTextSize') as number;
+    let sloganTextColor = uiConfig.get('sloganTextColor') as number;
+    let sloganTextBold = uiConfig.get('sloganTextBold') as boolean;
+    let logBtnOffsetX = uiConfig.get('logBtnOffsetX') as number;
+    let logBtnOffsetY = uiConfig.get('logBtnOffsetY') as number;
+    let logBtnWidth = uiConfig.get('logBtnWidth') as number;
+    let logBtnHeight = uiConfig.get('logBtnHeight') as number;
+    let logBtnText = uiConfig.get('logBtnText') as string;
+    let logBtnTextSize = uiConfig.get('logBtnTextSize') as number;
+    let logBtnTextColor = uiConfig.get('logBtnTextColor') as number;
+    let logBtnTextBold = uiConfig.get('logBtnTextBold') as boolean;
+    let logBtnBackgroundPath = uiConfig.get('logBtnBackgroundPath') as string;
+    let privacyCheckboxSize = uiConfig.get('privacyCheckboxSize') as number;
+    let checkedImgPath = uiConfig.get('checkedImgPath') as string;
+    let uncheckedImgPath = uiConfig.get('uncheckedImgPath') as string;
+    let privacyText = uiConfig.get('privacyText') as string;
+    let privacyTextSize = uiConfig.get('privacyTextSize') as number;
+    let privacyTextBold = uiConfig.get('privacyTextBold') as boolean;
+    let privacyUnderlineText = uiConfig.get('privacyUnderlineText') as boolean;
+    let privacyTextCenterGravity = uiConfig.get('privacyTextCenterGravity') as boolean;
+    let privacyCheckboxInCenter = uiConfig.get('privacyCheckboxInCenter') as boolean;
+    let privacyState = uiConfig.get('privacyState') as boolean;
+    let privacyNavColor = uiConfig.get('privacyNavColor') as number;
+    let privacyNavTitleTextSize = uiConfig.get('privacyNavTitleTextSize') as number;
+    let privacyNavTitleTextColor = uiConfig.get('privacyNavTitleTextColor') as number;
+    let privacyNavTitleTextBold = uiConfig.get('privacyNavTitleTextBold') as boolean;
+    let privacyNavReturnBtnPath = uiConfig.get('privacyNavReturnBtnPath') as string;
 
     if(authBackgroundImage) builder.setAuthBGImgPath(authBackgroundImage);
     if(logoOffsetX!=null) builder.setLogoOffsetX(logoOffsetX);
@@ -146,12 +162,37 @@ export default class JverifyPlugin implements FlutterPlugin, MethodCallHandler {
     if(privacyNavTitleTextColor!=null) builder.setPrivacyNavTitleTextColor(privacyNavTitleTextColor);
     if(privacyNavTitleTextBold!=null) builder.setPrivacyNavTitleTextBold(privacyNavTitleTextBold);
     if(privacyNavReturnBtnPath!=null) builder.setPrivacyNavReturnBtnPath(privacyNavReturnBtnPath);
+
+    builder.setLogBtnHeight(50);
+    builder.setLogBtnWidth(270);
+    builder.setTopSafeAreaHeight(50);
+
+    this.layoutOriginOuthViewCM(builder);
+  }
+  layoutOriginOuthViewCM(jgBuilder: JVerifyUIConfigBuilder){
+    let builder = new GenAuthThemeConfigBuilder();
+
+    builder.setLogBtnText('本机号码一键登录');
+    builder.setLoginBtnBorderRadius(12);
+    builder.setLoginBtnColor(0xffbe00);
+    builder.setLoginBtnHeight(50);
+    builder.setLoginBtnMargin({top:550});
+    builder.setLoginBtnTextColor(Color.Black);
+    builder.setLoginBtnTextSize(15);
+    builder.setLoginBtnWidth(270);
+
+    builder.setNumberColor(Color.Black);
+    builder.setNumberSize(36);
+    builder.setNumberMargin({top:200});
+
+    jgBuilder.setCmUIConfig(builder);
   }
   loginAuth(call: MethodCall, result: MethodResult){
     let autoDismiss: boolean = call.argument('autoDismiss');
     let timeout: number = call.argument('timeout');
 
-    let settings = new JVerificationLoginSettings();
+    let uiContext = this.uiAbility.context.windowStage.getMainWindowSync().getUIContext();
+    let settings = new JVerificationLoginSettings(uiContext);
     settings.autoFinish = autoDismiss;
     settings.timeout = timeout;
     JVerificationInterface.loginAuth(settings,(code,msg,operateRet)=>{
@@ -175,7 +216,7 @@ export default class JverifyPlugin implements FlutterPlugin, MethodCallHandler {
   }
   setup(call: MethodCall, result: MethodResult){
     let appKey: string = call.argument('appKey');
-    JVerificationInterface.init(appKey,(code, msg)=>{
+    JVerificationInterface.init(this.context.getApplicationContext(),appKey,(code: number, msg: string)=>{
       result.success({code,message:msg});
     });
   }
