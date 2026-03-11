@@ -175,7 +175,10 @@ export default class JverifyPlugin implements FlutterPlugin, MethodCallHandler, 
     builder.setLogBtnText('本机号码一键登录');
     builder.setLoginBtnBorderRadius(12);
     builder.setLoginBtnColor(0xffbe00);
+    builder.setLoginBtnDisabledColor(Color.Grey);
+    builder.setLoginBtnDisabledTextColor(0xffbe00);
     builder.setLoginBtnHeight(50);
+    builder.setLoginBtnImgPath("login_btn_normal");
     builder.setLoginBtnMargin({top:550});
     builder.setLoginBtnTextColor(Color.Black);
     builder.setLoginBtnTextSize(15);
