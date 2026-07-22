@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import cn.jiguang.api.utils.JCollectionAuth;
+import cn.jiguang.verifysdk.api.AuthPageBackPressedListener;
 import cn.jiguang.verifysdk.api.AuthPageEventListener;
 import cn.jiguang.verifysdk.api.JVerificationInterface;
 import cn.jiguang.verifysdk.api.JVerifyLoginBtClickCallback;
@@ -471,7 +472,7 @@ public class JverifyPlugin implements FlutterPlugin, MethodCallHandler {
             }
         };
 
-        if (enableSMSService != null) {
+        if (enableSMSService != null && (Boolean)enableSMSService) {
             JVerificationInterface.loginAuth((Boolean)enableSMSService, context, (Boolean) autoFinish, listener, eventListener);
         } else {
             LoginSettings settings = new LoginSettings();
@@ -621,6 +622,8 @@ public class JverifyPlugin implements FlutterPlugin, MethodCallHandler {
         Object authBackgroundImage = valueForKey(uiconfig, "authBackgroundImage");
         Object authBGVideoPath = valueForKey(uiconfig, "authBGVideoPath");
         Object authBGVideoImgPath = valueForKey(uiconfig, "authBGVideoImgPath");
+        Object authBGVideoScaleType = valueForKey(uiconfig, "authBGVideoScaleType");
+        Object authPageBackPressedListener = valueForKey(uiconfig, "authPageBackPressedListener");
 
         Object navColor = valueForKey(uiconfig, "navColor");
         Object navText = valueForKey(uiconfig, "navText");
@@ -672,6 +675,9 @@ public class JverifyPlugin implements FlutterPlugin, MethodCallHandler {
         Object privacyTopOffsetY = valueForKey(uiconfig, "privacyTopOffsetY");
         Object privacyOffsetY = valueForKey(uiconfig, "privacyOffsetY");
         Object privacyOffsetX = valueForKey(uiconfig, "privacyOffsetX");
+
+        Object privacyMarginT = valueForKey(uiconfig, "privacyMarginT");
+        Object privacyMarginR = valueForKey(uiconfig, "privacyMarginR");
 //        Object CLAUSE_NAME = valueForKey(uiconfig, "clauseName");
 //        Object CLAUSE_URL = valueForKey(uiconfig, "clauseUrl");
         Object CLAUSE_BASE_COLOR = valueForKey(uiconfig, "clauseBaseColor");
@@ -834,6 +840,17 @@ public class JverifyPlugin implements FlutterPlugin, MethodCallHandler {
             if (!((String)authBGVideoPath).startsWith("http"))
                 authBGVideoPath = "android.resource://"+context.getPackageName()+"/raw/"+authBGVideoPath;
             builder.setAuthBGVideoPath((String) authBGVideoPath, (String) authBGVideoImgPath);
+        }
+        if (authBGVideoScaleType != null) {
+            builder.setAuthBGVideoScaleType((Integer) authBGVideoScaleType);
+        }
+        if (authPageBackPressedListener != null && (Boolean) authPageBackPressedListener) {
+            builder.setAuthPageBackPressedListener(new AuthPageBackPressedListener() {
+                @Override
+                public void onBackPressed() {
+                    runMainThread(new HashMap<String, Object>(), null, "onReceiveAuthPageBackPressedEvent");
+                }
+            });
         }
 
         /************** nav ***************/
@@ -1025,6 +1042,14 @@ public class JverifyPlugin implements FlutterPlugin, MethodCallHandler {
         if (privacyOffsetX != null) {
             builder.setPrivacyMarginL((Integer) privacyOffsetX);
         }
+
+        if (privacyMarginR != null) {
+            builder.setPrivacyMarginR((Integer) privacyMarginR);
+        }
+        if (privacyMarginT != null) {
+            builder.setPrivacyMarginT((Integer) privacyMarginT);
+        }
+
         if (privacyCheckboxSize != null) {
             builder.setPrivacyCheckboxSize((Integer) privacyCheckboxSize);
         }
@@ -1331,7 +1356,7 @@ public class JverifyPlugin implements FlutterPlugin, MethodCallHandler {
                     builder.setSmsSloganOffsetBottomY((Integer) smsSloganOffsetBottomY);
                 }
                 if(smsSloganTextColor !=null){
-                    builder.setSmsSloganTextColor((Integer) smsSloganTextColor);
+                    builder.setSmsSloganTextColor(exchangeObject(smsSloganTextColor));
                 }
                 if(smsLogoWidth !=null){
                     builder.setSmsLogoWidth((Integer) smsLogoWidth);
@@ -1397,7 +1422,7 @@ public class JverifyPlugin implements FlutterPlugin, MethodCallHandler {
                     builder.setSmsPhoneTextViewTextSize((Integer) smsPhoneTextViewTextSize);
                 }
                 if(smsPhoneTextViewTextColor !=null){
-                    builder.setSmsPhoneTextViewTextColor((Integer) smsPhoneTextViewTextColor);
+                    builder.setSmsPhoneTextViewTextColor(exchangeObject(smsPhoneTextViewTextColor));
                 }
                 if(smsPhoneInputViewOffsetX !=null){
                     builder.setSmsPhoneInputViewOffsetX((Integer) smsPhoneInputViewOffsetX);
@@ -1412,7 +1437,7 @@ public class JverifyPlugin implements FlutterPlugin, MethodCallHandler {
                     builder.setSmsPhoneInputViewHeight((Integer) smsPhoneInputViewHeight);
                 }
                 if(smsPhoneInputViewTextColor !=null){
-                    builder.setSmsPhoneInputViewTextColor((Integer) smsPhoneInputViewTextColor);
+                    builder.setSmsPhoneInputViewTextColor(exchangeObject(smsPhoneInputViewTextColor));
                 }
                 if(smsPhoneInputViewTextSize !=null){
                     builder.setSmsPhoneInputViewTextSize((Integer) smsPhoneInputViewTextSize);
@@ -1427,13 +1452,13 @@ public class JverifyPlugin implements FlutterPlugin, MethodCallHandler {
                     builder.setSmsVerifyCodeTextSizeTextSize((Integer) smsVerifyCodeTextViewTextSize);
                 }
                 if(smsVerifyCodeTextViewTextColor !=null){
-                    builder.setSmsVerifyCodeTextViewTextColor((Integer) smsVerifyCodeTextViewTextColor);
+                    builder.setSmsVerifyCodeTextViewTextColor(exchangeObject(smsVerifyCodeTextViewTextColor));
                 }
                 if(smsVerifyCodeEditTextViewTextSize !=null){
                     builder.setSmsVerifyCodeEditTextViewTextSize((Integer) smsVerifyCodeEditTextViewTextSize);
                 }
                 if(smsVerifyCodeEditTextViewTextColor !=null){
-                    builder.setSmsVerifyCodeEditTextViewTextColor((Integer) smsVerifyCodeEditTextViewTextColor);
+                    builder.setSmsVerifyCodeEditTextViewTextColor(exchangeObject(smsVerifyCodeEditTextViewTextColor));
                 }
                 if(smsVerifyCodeEditTextViewOffsetX !=null){
                     builder.setSmsVerifyCodeEditTextViewTextOffsetX((Integer) smsVerifyCodeEditTextViewOffsetX);
@@ -1460,7 +1485,7 @@ public class JverifyPlugin implements FlutterPlugin, MethodCallHandler {
                     builder.setSmsGetVerifyCodeTextSize((Integer) smsGetVerifyCodeTextViewTextSize);
                 }
                 if(smsGetVerifyCodeTextViewTextColor !=null){
-                    builder.setSmsGetVerifyCodeTextViewTextColor((Integer) smsGetVerifyCodeTextViewTextColor);
+                    builder.setSmsGetVerifyCodeTextViewTextColor(exchangeObject(smsGetVerifyCodeTextViewTextColor));
                 }
 //                if(smsGetVerifyCodeTextViewOffsetR !=null){
 //                    builder.setSmsGetVerifyCodeTextViewOffsetR((Integer) smsGetVerifyCodeTextViewOffsetR);
@@ -1533,7 +1558,7 @@ public class JverifyPlugin implements FlutterPlugin, MethodCallHandler {
                     builder.setSmsLogBtnText((String) smsLogBtnText);
                 }
                 if(smsLogBtnTextColor !=null){
-                    builder.setSmsLogBtnTextColor((Integer) smsLogBtnTextColor);
+                    builder.setSmsLogBtnTextColor(exchangeObject(smsLogBtnTextColor));
                 }
                 if(isSmsLogBtnTextBold !=null){
                     builder.isSmsLogBtnTextBold((Boolean) isSmsLogBtnTextBold);
@@ -1554,7 +1579,7 @@ public class JverifyPlugin implements FlutterPlugin, MethodCallHandler {
                     builder.setSmsFirstSeperLineOffsetR((Integer) smsFirstSeperLineOffsetR);
                 }
                 if(smsFirstSeperLineColor !=null){
-                    builder.setSmsFirstSeperLineColor((Integer) smsFirstSeperLineColor);
+                    builder.setSmsFirstSeperLineColor(exchangeObject(smsFirstSeperLineColor));
                 }
                 if(smsSecondSeperLineOffsetX !=null){
                     builder.setSmsSecondSeperLineOffsetX((Integer) smsSecondSeperLineOffsetX);
@@ -1566,7 +1591,7 @@ public class JverifyPlugin implements FlutterPlugin, MethodCallHandler {
                     builder.setSmsSecondSeperLineOffsetR((Integer) smsSecondSeperLineOffsetR);
                 }
                 if(smsSecondSeperLineColor !=null){
-                    builder.setSmsSecondSeperLineColor((Integer) smsSecondSeperLineColor);
+                    builder.setSmsSecondSeperLineColor(exchangeObject(smsSecondSeperLineColor));
                 }
                 if(isSmsPrivacyTextGravityCenter !=null){
                     builder.isSmsPrivacyTextGravityCenter((Boolean) isSmsPrivacyTextGravityCenter);

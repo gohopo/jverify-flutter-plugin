@@ -556,9 +556,35 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
     }
     
     if ([[config allKeys] containsObject:@"authBGVideoPath"] && [[config allKeys] containsObject:@"authBGVideoImgPath"]) {
-        [uiconfig setVideoBackgroudResource:[config objectForKey:@"authBGVideoPath"] placeHolder:[config objectForKey:@"authBGVideoImgPath"]];
-        uiconfig.smsAuthPageVideoPath = [config objectForKey:@"authBGVideoPath"];
-        uiconfig.smsAuthPageVideoPlaceHolderImageName = [config objectForKey:@"authBGVideoImgPath"];
+        NSString *videoPath = [config objectForKey:@"authBGVideoPath"];
+        NSString *placeHolderPath = [config objectForKey:@"authBGVideoImgPath"];
+        
+        // 判断是否为网络视频URL
+        if ([videoPath hasPrefix:@"http://"] || [videoPath hasPrefix:@"https://"]) {
+            // 网络视频，直接使用URL
+            [uiconfig setVideoBackgroudResource:videoPath placeHolder:placeHolderPath];
+            uiconfig.smsAuthPageVideoPath = videoPath;
+            uiconfig.smsAuthPageVideoPlaceHolderImageName = placeHolderPath;
+        } else {
+            // 本地视频，需要获取完整路径
+            NSString *localVideoPath = [[NSBundle mainBundle] pathForResource:videoPath ofType:nil];
+            if (!localVideoPath) {
+                // 如果没有找到，尝试添加常见视频扩展名
+                NSArray *videoExtensions = @[@"mp4", @"mov", @"m4v", @"avi"];
+                for (NSString *ext in videoExtensions) {
+                    localVideoPath = [[NSBundle mainBundle] pathForResource:videoPath ofType:ext];
+                    if (localVideoPath) break;
+                }
+            }
+            
+            if (localVideoPath) {
+                [uiconfig setVideoBackgroudResource:localVideoPath placeHolder:placeHolderPath];
+                uiconfig.smsAuthPageVideoPath = localVideoPath;
+                uiconfig.smsAuthPageVideoPlaceHolderImageName = placeHolderPath;
+            } else {
+                JVLog(@"Warning: Local video file not found: %@", videoPath);
+            }
+        }
     }
     if ([[config allKeys] containsObject:@"authBGGifPath"]) {
         NSString *gifPath = [[NSBundle mainBundle] pathForResource:[config objectForKey:@"authBGGifPath"] ofType:@"gif"];
@@ -685,8 +711,9 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
     }else{
         JVLayoutConstraint *slogan_cons_top = JVLayoutTop([sloganOffsetY floatValue], sloganLayoutItem,NSLayoutAttributeBottom);
         JVLayoutConstraint *slogan_cons_centerx = JVLayoutCenterX([sloganOffsetX floatValue]);
-        CGFloat sloganH = [sloganHeight floatValue]>0?:20;
-        CGFloat sloganW = [sloganWidth floatValue]>0?:200;
+        CGFloat sloganH = [sloganHeight floatValue] >0 ? [sloganHeight floatValue] : 20;
+        CGFloat sloganW = [sloganWidth floatValue] > 0 ? [sloganWidth floatValue] : 200;
+
         JVLayoutConstraint *slogan_cons_width = JVLayoutWidth(sloganW);
         JVLayoutConstraint *slogan_cons_height = JVLayoutHeight(sloganH);
         uiconfig.sloganConstraints = @[slogan_cons_top,slogan_cons_centerx,slogan_cons_width,slogan_cons_height];
@@ -1002,7 +1029,7 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
     JVLayoutConstraint *privacy_cons_x = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemSuper attribute:NSLayoutAttributeLeft multiplier:1 constant:privacyLeftSpace];
     JVLayoutConstraint *privacy_cons_y = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemSuper attribute:NSLayoutAttributeBottom multiplier:1 constant:-[privacyOffsetY floatValue]];
     JVLayoutConstraint *privacy_cons_w = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemNone attribute:NSLayoutAttributeWidth multiplier:1 constant:lableWidht];
-    JVLayoutConstraint *privacy_cons_h = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemNone attribute:NSLayoutAttributeHeight multiplier:1 constant:lablesize.height];
+    JVLayoutConstraint *privacy_cons_h = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemNone attribute:NSLayoutAttributeHeight multiplier:1 constant:lablesize.height + 1];
     if (privacyLayoutItem == JVLayoutItemNone) {
         uiconfig.privacyOffsetY = [privacyOffsetY floatValue];
     }else{
